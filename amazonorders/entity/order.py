@@ -48,34 +48,50 @@ class Order(Parsable):
         #: :func:`~amazonorders.orders.AmazonOrders.get_order_history` (use ``start_index`` to correlate).
         self.index: Optional[int] = index
 
-        #: The Order Shipments.
-        self.shipments: List[Shipment] = clone.shipments if clone else self._parse_shipments()
+        #: The Order Shipments. Prefer Order Details info when available.
+        if full_details or not clone:
+            self.shipments: List[Shipment] = self._parse_shipments()
+        else:
+            self.shipments: List[Shipment] = clone.shipments
         #: The Order Items.
         self.items: List[Item] = clone.items if clone and not full_details else self._parse_items()
         self.title: str = " + ".join(str(item) for item in self.items) if self.items else ""
         self.item_quantity: int = len(self.items)
-        #: The Order number.
-        self.order_id: str = clone.order_id if clone else self.safe_parse(
-            self._parse_order_id, required=True)
+        #: The Order number. Prefer Order Details info when available.
+        parsed_order_id = self.safe_parse(self._parse_order_id)
+        if parsed_order_id is None and clone is None:
+            parsed_order_id = self.safe_parse(self._parse_order_id, required=True)
+        self.order_id: str = parsed_order_id if parsed_order_id else (clone.order_id if clone else None)
         self.payment_reference_id: str = self.order_id
         #: The Order details link.
-        self.order_details_link: Optional[str] = clone.order_details_link if clone else self.safe_parse(
-            self._parse_order_details_link)
+        parsed_details_link = self.safe_parse(self._parse_order_details_link)
+        self.order_details_link: Optional[str] = parsed_details_link if parsed_details_link else (
+            clone.order_details_link if clone else None)
         #: The Order invoice link.
-        if clone and clone.invoice_link:
-            self.invoice_link: Optional[str] = clone.invoice_link
+        parsed_invoice_link = self.safe_parse(self._parse_invoice_link)
+        if parsed_invoice_link:
+            self.invoice_link: Optional[str] = parsed_invoice_link
+        elif clone and clone.invoice_link:
+            self.invoice_link = clone.invoice_link
         else:
-            self.invoice_link: Optional[str] = self.safe_parse(self._parse_invoice_link)
+            self.invoice_link = None
         #: The Order grand total.
-        self.grand_total: float = clone.grand_total if clone else self.safe_parse(self._parse_grand_total)
+        parsed_grand_total = self.safe_parse(self._parse_grand_total)
+        self.grand_total: float = parsed_grand_total if parsed_grand_total is not None else (
+            clone.grand_total if clone else 0.0)
         self.item_net_total: float = self.grand_total
         self.payment_amount: float = self.grand_total
         #: The Order placed date.
-        self.order_date: date = clone.order_date if clone else self.safe_parse(
-            self._parse_order_date, required=True)
+        parsed_order_date = self.safe_parse(self._parse_order_date)
+        if parsed_order_date is None and clone is None:
+            parsed_order_date = self.safe_parse(self._parse_order_date, required=True)
+        self.order_date: date = parsed_order_date if parsed_order_date else (
+            clone.order_date if clone else None)
         self.payment_date: date = self.order_date + timedelta(days=1)
         #: The Order Recipients.
-        self.recipient: Recipient = clone.recipient if clone else self.safe_parse(self._parse_recipient)
+        parsed_recipient = self.safe_parse(self._parse_recipient)
+        self.recipient: Optional[Recipient] = parsed_recipient if parsed_recipient else (
+            clone.recipient if clone else None)
 
         # Fields below this point are only populated if `full_details` is True
 

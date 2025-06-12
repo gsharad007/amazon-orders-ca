@@ -179,7 +179,12 @@ class Parsable:
         :return: The fully qualified URL.
         """
         if not url.startswith("http"):
-            url = f"{self.config.constants.BASE_URL}{url}"
+            base_url = self.config.constants.BASE_URL
+            html_str = str(self.parsed)
+            match = re.search(r"https://www\.amazon\.(com|ca)", html_str)
+            if match:
+                base_url = match.group(0)
+            url = f"{base_url}{url}"
         return url
 
     def to_currency(self,

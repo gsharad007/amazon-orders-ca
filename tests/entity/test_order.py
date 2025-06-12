@@ -122,3 +122,22 @@ class TestOrder(UnitTestCase):
 
         # THEN details recipient should override
         self.assertEqual("John Doe", order.recipient.name)
+
+    def test_recipient_new_shipping_address_component(self):
+        """Recipient should parse from new shippingAddress component."""
+        with open(
+            os.path.join(
+                self.RESOURCES_DIR,
+                "orders",
+                "2024",
+                "order-details-701-1723646-9872233.html",
+            ),
+            "r",
+            encoding="utf-8",
+        ) as f:
+            soup = BeautifulSoup(f.read(), self.test_config.bs4_parser)
+        tag = util.select_one(soup, self.test_config.selectors.ORDER_DETAILS_ENTITY_SELECTOR)
+
+        order = Order(tag, self.test_config, full_details=True)
+
+        self.assertEqual("Pooja Jain", order.recipient.name)

@@ -411,7 +411,7 @@ def transactions(ctx: Context, **kwargs: Any):
                 try: 
                     order = amazon_orders.get_order(t.order_id, current_index=t.index)
                     order.payment_date = t.completed_date
-                    order.payment_amount = t.grand_total
+                    order.payment_amount = -t.grand_total
                     order.payment_method = t.payment_method
                     # order.payment_method_last_4 = t.payment_method_last_4
                     t.order = order

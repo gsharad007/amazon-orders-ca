@@ -235,6 +235,8 @@ Order History for {year}{optional_start_index}{optional_full_details}
                         order_dict["order_date"] = o.order_date.strftime("%Y/%m/%d")
                     if isinstance(o.payment_date, datetime.date):
                         order_dict["payment_date"] = o.payment_date.strftime("%Y/%m/%d")
+                    if o.recipient:
+                        order_dict["recipient"] = str(o.recipient)
                     orders_dict.append(order_dict)
 
             # Convert list of dataclass‐like objects into a list of dicts
@@ -442,6 +444,8 @@ def transactions(ctx: Context, **kwargs: Any):
                     order_dict["order_date"] = o.order_date.strftime("%Y/%m/%d")
                 if isinstance(o.payment_date, datetime.date):
                     order_dict["payment_date"] = o.payment_date.strftime("%Y/%m/%d")
+                if o.recipient:
+                    order_dict["recipient"] = str(o.recipient)
                 orders_dict.append(order_dict)
 
             df = pd.DataFrame(orders_dict)

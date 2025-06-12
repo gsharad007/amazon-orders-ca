@@ -102,7 +102,19 @@ class Order(Parsable):
             self._parse_currency("coupon", combine_multiple=True)) or 0.0
         #: The Order Subscribe & Save discount. Only populated when ``full_details`` is ``True``.
         self.subscription_discount: float = self._if_full_details(self._parse_currency("subscribe")) or 0.0
-        self.item_promotion: float = (self.promotion or 0.0) + (self.coupon_savings or 0.0) + (self.subscription_discount or 0.0)
+        #: The Order paid by amazon applied. Only populated when ``full_details`` is ``True``.
+        self.other_promotions: float = (
+            self._if_full_details(
+                self._parse_currency("amount paid by amazon", combine_multiple=True)
+            )
+            or 0.0
+        )
+        self.item_promotion: float = (
+            (self.promotion or 0.0)
+            + (self.coupon_savings or 0.0)
+            + (self.subscription_discount or 0.0)
+            + (self.other_promotions or 0.0)
+        )
         #: The Order total before tax. Only populated when ``full_details`` is ``True``.
         self.total_before_tax: Optional[float] = self._if_full_details(self._parse_currency("total before tax"))
         #: The Order estimated tax. Only populated when ``full_details`` is ``True``.

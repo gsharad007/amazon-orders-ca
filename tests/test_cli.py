@@ -210,13 +210,7 @@ class TestCli(UnitTestCase):
         pdf_link = "/documents/download/abc123/invoice.pdf"
         responses.add(
             responses.GET,
-            f"{self.test_config.constants.ORDER_INVOICE_MENU_URL}?orderId={order_id}",
-            body=f"<a href='{pdf_link}'>Invoice 1</a>",
-            status=200,
-        )
-        responses.add(
-            responses.GET,
-            f"{self.test_config.constants.BASE_URL}{pdf_link}",
+            f"{self.test_config.constants.ORDER_INVOICE_URL}?orderID=112-5939971-8962610",
             body=b"PDFDATA",
             status=200,
             content_type="application/pdf",
@@ -247,5 +241,51 @@ class TestCli(UnitTestCase):
             # THEN
             self.assertEqual(0, response.exit_code)
             self.assertTrue(os.path.exists("transactions-1.csv"))
+            with open("transactions-1.csv", "r") as f:
+                header = f.readline()
+                first_row = f.readline()
+            self.assertIn("Invoice Link", header)
+            self.assertIn("print.html", first_row)
             expected = "AmazonInvoice_20241101_123-4567890-1234567.pdf"
             self.assertTrue(os.path.exists(expected))
+
+    @responses.activate
+    @patch("amazonorders.transactions.datetime", wraps=datetime)
+    def test_transactions_command_full_details_csv_recipient(self, mock_get_today: Mock):
+        """Recipient column should appear in CSV exports."""
+        # GIVEN
+        mock_get_today.date.today.return_value = datetime.date(2024, 10, 11)
+        days = 1
+        self.given_login_responses_success()
+        self.given_transactions_exists()
+        self.given_any_order_details_exists("order-details-112-5939971-8962610.html")
+
+        # WHEN
+        with self.runner.isolated_filesystem():
+            response = self.runner.invoke(
+                amazon_orders_cli,
+                [
+                    "--config-path",
+                    self.test_config.config_path,
+                    "--username",
+                    "some-username",
+                    "--password",
+                    "some-password",
+                    "--output-dir",
+                    ".",
+                    "transactions",
+                    "--days",
+                    days,
+                    "--full-details",
+                    "--csv",
+                ],
+            )
+
+            # THEN
+            self.assertEqual(0, response.exit_code)
+            self.assertTrue(os.path.exists("transactions-1.csv"))
+            with open("transactions-1.csv", "r") as f:
+                header = f.readline()
+                first_row = f.readline()
+            self.assertIn("Recipient", header)
+            self.assertIn("Alex Laird", first_row)

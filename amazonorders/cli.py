@@ -235,6 +235,8 @@ Order History for {year}{optional_start_index}{optional_full_details}
                         order_dict["order_date"] = o.order_date.strftime("%Y/%m/%d")
                     if isinstance(o.payment_date, datetime.date):
                         order_dict["payment_date"] = o.payment_date.strftime("%Y/%m/%d")
+                    if o.recipient:
+                        order_dict["recipient"] = str(o.recipient)
                     orders_dict.append(order_dict)
 
             # Convert list of dataclass‐like objects into a list of dicts
@@ -265,6 +267,7 @@ Order History for {year}{optional_start_index}{optional_full_details}
                     "amazon_commodity": "Commodity",
                     "items": "Items",
                     "order_details_link": "Order Details Link",
+                    "invoice_link": "Invoice Link",
                     "grand_total": "Grand Total",
                     "recipient": "Recipient",
                     "free_shipping": "Free Shipping",
@@ -299,6 +302,7 @@ Order History for {year}{optional_start_index}{optional_full_details}
                     "Commodity",
                     "Items",
                     "Order Details Link",
+                    "Invoice Link",
                     "Grand Total",
                     "Recipient",
                     "Free Shipping",
@@ -407,7 +411,7 @@ def transactions(ctx: Context, **kwargs: Any):
                 try: 
                     order = amazon_orders.get_order(t.order_id, current_index=t.index)
                     order.payment_date = t.completed_date
-                    order.payment_amount = t.grand_total
+                    order.payment_amount = -t.grand_total
                     order.payment_method = t.payment_method
                     # order.payment_method_last_4 = t.payment_method_last_4
                     t.order = order
@@ -440,6 +444,8 @@ def transactions(ctx: Context, **kwargs: Any):
                     order_dict["order_date"] = o.order_date.strftime("%Y/%m/%d")
                 if isinstance(o.payment_date, datetime.date):
                     order_dict["payment_date"] = o.payment_date.strftime("%Y/%m/%d")
+                if o.recipient:
+                    order_dict["recipient"] = str(o.recipient)
                 orders_dict.append(order_dict)
 
             df = pd.DataFrame(orders_dict)
@@ -469,6 +475,7 @@ def transactions(ctx: Context, **kwargs: Any):
                     "amazon_commodity": "Commodity",
                     "items": "Items",
                     "order_details_link": "Order Details Link",
+                    "invoice_link": "Invoice Link",
                     "grand_total": "Grand Total",
                     "recipient": "Recipient",
                     "free_shipping": "Free Shipping",
@@ -503,6 +510,7 @@ def transactions(ctx: Context, **kwargs: Any):
                     "Commodity",
                     "Items",
                     "Order Details Link",
+                    "Invoice Link",
                     "Grand Total",
                     "Recipient",
                     "Free Shipping",
@@ -654,6 +662,8 @@ Order #{order_id}
 
     order_str += f"\n  Shipments: {o.shipments}"
     order_str += f"\n  Order Details Link: {o.order_details_link}"
+    if o.invoice_link:
+        order_str += f"\n  Invoice Link: {o.invoice_link}"
     order_str += f"\n  Grand Total: {config.constants.format_currency(o.grand_total)}"
     order_str += f"\n  Order Placed Date: {o.order_date}"
     if o.payment_date:
@@ -693,6 +703,8 @@ def _transaction_output(t: Transaction,
     transaction_str += f"\n  Order #{t.order_id}"
     transaction_str += f"\n  Grand Total: {config.constants.format_currency(t.grand_total)}"
     transaction_str += f"\n  Order Details Link: {t.order_details_link}"
+    if t.order and t.order.invoice_link:
+        transaction_str += f"\n  Invoice Link: {t.order.invoice_link}"
 
     return transaction_str
 

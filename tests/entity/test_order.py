@@ -6,6 +6,7 @@ import os
 from bs4 import BeautifulSoup
 
 from amazonorders.entity.order import Order
+from amazonorders import util
 from tests.unittestcase import UnitTestCase
 
 
@@ -95,3 +96,48 @@ class TestOrder(UnitTestCase):
 
         # THEN
         self.assertEqual(order.coupon_savings, -1.29)
+
+    def test_recipient_prefers_details(self):
+        """Recipient parsed from order details should override clone data."""
+        # GIVEN clone order from history
+        with open(os.path.join(self.RESOURCES_DIR, "orders", "order-history-2024-0.html"),
+                  "r", encoding="utf-8") as f:
+            history_soup = BeautifulSoup(f.read(), self.test_config.bs4_parser)
+        order_tag = util.select(history_soup, self.test_config.selectors.ORDER_HISTORY_ENTITY_SELECTOR)[0]
+        clone_order = Order(order_tag, self.test_config)
+
+        # Sanity check clone recipient
+        self.assertEqual("Alex Laird", clone_order.recipient.name)
+
+        # GIVEN order details with different recipient name
+        with open(
+            os.path.join(self.RESOURCES_DIR, "orders", "order-details-112-5939971-8962610-mod.html"),
+            "r", encoding="utf-8"
+        ) as f:
+            details_soup = BeautifulSoup(f.read(), self.test_config.bs4_parser)
+        details_tag = util.select_one(details_soup, self.test_config.selectors.ORDER_DETAILS_ENTITY_SELECTOR)
+
+        # WHEN
+        order = Order(details_tag, self.test_config, full_details=True, clone=clone_order)
+
+        # THEN details recipient should override
+        self.assertEqual("John Doe", order.recipient.name)
+
+    def test_recipient_new_shipping_address_component(self):
+        """Recipient should parse from new shippingAddress component."""
+        with open(
+            os.path.join(
+                self.RESOURCES_DIR,
+                "orders",
+                "2024",
+                "order-details-701-1723646-9872233.html",
+            ),
+            "r",
+            encoding="utf-8",
+        ) as f:
+            soup = BeautifulSoup(f.read(), self.test_config.bs4_parser)
+        tag = util.select_one(soup, self.test_config.selectors.ORDER_DETAILS_ENTITY_SELECTOR)
+
+        order = Order(tag, self.test_config, full_details=True)
+
+        self.assertEqual("Pooja Jain", order.recipient.name)

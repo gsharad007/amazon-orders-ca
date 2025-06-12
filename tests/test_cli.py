@@ -210,13 +210,7 @@ class TestCli(UnitTestCase):
         pdf_link = "/documents/download/abc123/invoice.pdf"
         responses.add(
             responses.GET,
-            f"{self.test_config.constants.ORDER_INVOICE_MENU_URL}?orderId={order_id}",
-            body=f"<a href='{pdf_link}'>Invoice 1</a>",
-            status=200,
-        )
-        responses.add(
-            responses.GET,
-            f"{self.test_config.constants.BASE_URL}{pdf_link}",
+            f"{self.test_config.constants.ORDER_INVOICE_URL}?orderID=112-5939971-8962610",
             body=b"PDFDATA",
             status=200,
             content_type="application/pdf",
@@ -247,5 +241,10 @@ class TestCli(UnitTestCase):
             # THEN
             self.assertEqual(0, response.exit_code)
             self.assertTrue(os.path.exists("transactions-1.csv"))
+            with open("transactions-1.csv", "r") as f:
+                header = f.readline()
+                first_row = f.readline()
+            self.assertIn("Invoice Link", header)
+            self.assertIn("print.html", first_row)
             expected = "AmazonInvoice_20241101_123-4567890-1234567.pdf"
             self.assertTrue(os.path.exists(expected))

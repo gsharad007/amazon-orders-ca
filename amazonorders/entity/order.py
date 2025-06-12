@@ -56,7 +56,7 @@ class Order(Parsable):
         #: The Order Items.
         self.items: List[Item] = clone.items if clone and not full_details else self._parse_items()
         self.title: str = " + ".join(str(item) for item in self.items) if self.items else ""
-        self.item_quantity: int = len(self.items)
+        self.item_quantity: int = max(len(self.items), 1)
         #: The Order number. Prefer Order Details info when available.
         parsed_order_id = self.safe_parse(self._parse_order_id)
         if parsed_order_id is None and clone is None:

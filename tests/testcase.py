@@ -571,6 +571,7 @@ class TestCase(unittest.TestCase):
             self.assertEqual(-2.00, order.coupon_savings)
             self.assertEqual(26.99, order.total_before_tax)
             self.assertEqual(3.51, order.item_federal_tax)
+            self.assertEqual(0.00, order.item_regulatory_fee)
             self.assertEqual(28.99, order.items[0].price)
             self.assertEqual("Tessan Direct", order.items[0].seller.name)
             self.assertIsNotNone(order.items[0].seller.link)

@@ -422,12 +422,14 @@ class Order(Parsable):
         if value is None:
             text = self.parsed.get_text(" ", strip=True)
             if contains == "estimated tax":
-                matches = re.findall(r"Tax \(.*?\):\s*([$\d.,]+)", text, flags=re.I)
+                matches = re.findall(
+                    r"Tax \(.*?\):\s*([$\d.,]+)", text, flags=re.I
+                )
             else:
                 if contains in {"hst", "pst"}:
-                    pattern = rf"Tax[^$\n]*{re.escape(contains)}[^$\d]*([$\d.,]+)"
+                    pattern = rf"Tax[^$\n]*\b{re.escape(contains)}\b[^$\d]*:\s*([$\d.,]+)"
                 else:
-                    pattern = rf"{re.escape(contains)}[^$\d]*([$\d.,]+)"
+                    pattern = rf"\b{re.escape(contains)}\b[^$\d]*:\s*([$\d.,]+)"
                 matches = re.findall(pattern, text, flags=re.I)
 
             for m in matches:

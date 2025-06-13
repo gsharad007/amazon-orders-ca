@@ -462,6 +462,7 @@ class TestCase(unittest.TestCase):
         self.assertEqual(0.00, order.item_federal_tax)
         self.assertEqual(0.00, order.item_provincial_tax)
         self.assertEqual(0.00, order.estimated_tax)
+        self.assertEqual(0.00, order.item_regulatory_fee)
 
         self.assertEqual(order.full_details, full_details)
 

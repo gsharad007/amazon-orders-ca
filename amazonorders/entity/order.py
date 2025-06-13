@@ -429,7 +429,10 @@ class Order(Parsable):
                 else:
                     pattern = rf"{re.escape(contains)}[^$\d]*([$\d.,]+)"
                 matches = re.findall(pattern, text, flags=re.I)
+
             for m in matches:
+                if "." not in m and "$" not in m and "," not in m:
+                    continue
                 currency = self.to_currency(m)
                 if currency is not None:
                     if value is None:

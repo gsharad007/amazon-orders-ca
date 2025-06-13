@@ -62,7 +62,9 @@ class Order(Parsable):
         if parsed_order_id is None and clone is None:
             parsed_order_id = self.safe_parse(self._parse_order_id, required=True)
         self.order_id: str = parsed_order_id if parsed_order_id else (clone.order_id if clone else None)
-        self.payment_reference_id: str = self.order_id + f"-{self.index}" if self.index else ""
+        self.payment_reference_id: str = self.order_id + (
+            f"-{self.index}" if self.index is not None else ""
+        )
         #: The Order details link.
         parsed_details_link = self.safe_parse(self._parse_order_details_link)
         self.order_details_link: Optional[str] = parsed_details_link if parsed_details_link else (

@@ -169,10 +169,66 @@ class Order(Parsable):
         if not self.parsed or len(util.select(self.parsed, self.config.selectors.ORDER_SKIP_ITEMS)) > 0:
             return []
 
-        items: List[Item] = [self.config.item_cls(x, self.config)
-                             for x in util.select(self.parsed,
-                                                  self.config.selectors.ITEM_ENTITY_SELECTOR)]
+        items: List[Item] = [
+            self.config.item_cls(x, self.config)
+            for x in util.select(
+                self.parsed, self.config.selectors.ITEM_ENTITY_SELECTOR
+            )
+        ]
+
+        if not items:
+            items = self._parse_digital_items()
+
         items.sort()
+        return items
+
+    def _parse_digital_items(self) -> List[Item]:
+        items: List[Item] = []
+
+        for header in self.parsed.find_all("b", string=re.compile("Items Ordered", re.I)):
+            table = header.find_parent("table")
+            if not table:
+                continue
+            header_row = header.find_parent("tr")
+            rows = header_row.find_next_siblings("tr") if header_row else []
+            for row in rows:
+                cols = row.find_all("td")
+                if len(cols) < 2:
+                    continue
+
+                left, right = cols[0], cols[1]
+
+                link_tag = left.find("a")
+                if link_tag:
+                    title = link_tag.get_text(strip=True)
+                    link = link_tag.get("href", "#")
+                else:
+                    b_tag = left.find("b")
+                    title = b_tag.get_text(strip=True) if b_tag else left.get_text(strip=True)
+                    link = "#"
+
+                qty_match = re.search(r"Qty:\s*(\d+)", left.get_text())
+                qty = qty_match.group(1) if qty_match else "1"
+
+                seller_match = re.search(r"Sold\s+By:\s*([^\n<]+)", left.get_text())
+                seller = seller_match.group(1).strip() if seller_match else ""
+
+                price_text = right.get_text(strip=True)
+
+                html = (
+                    f"<div class='yohtmlc-item'>"
+                    f"<span data-component='itemTitle'><a href='{link}'>{title}</a></span>"
+                    f"<span class='a-color-price'>{price_text}</span>"
+                )
+                if seller:
+                    html += (
+                        f"<div data-component='orderedMerchant'>Sold by: {seller}</div>"
+                    )
+                html += f"<span class='od-item-view-qty'>{qty}</span></div>"
+
+                items.append(self.config.item_cls(BeautifulSoup(html, self.config.bs4_parser), self.config))
+            break
+
         return items
 
     def _parse_order_id(self, required: bool = False) -> Optional[str]:
@@ -272,6 +328,14 @@ class Order(Parsable):
                     break
 
         if not value:
+            match = re.search(
+                r"(Order Total|Total for this Order)[^$\d]*([$\d.,]+)",
+                self.parsed.get_text(" ", strip=True),
+            )
+            if match:
+                value = match.group(2)
+
+        if not value:
             value = self._parse_currency("grand total")
         elif value.lower().startswith(total_str):
             value = value[len(total_str):].strip()
@@ -287,8 +351,9 @@ class Order(Parsable):
         return value
 
     def _parse_recipient(self) -> Optional[Recipient]:
-        # At least for now, we don't populate Recipient data for digital orders
-        if util.select_one(self.parsed, self.config.selectors.FIELD_ORDER_GIFT_CARD_INSTANCE_SELECTOR):
+        if util.select_one(
+            self.parsed, self.config.selectors.FIELD_ORDER_GIFT_CARD_INSTANCE_SELECTOR
+        ):
             return None
 
         value = util.select_one(self.parsed, self.config.selectors.FIELD_ORDER_ADDRESS_SELECTOR)
@@ -323,6 +388,16 @@ class Order(Parsable):
                 value = BeautifulSoup(str(parent_tag.contents[0]).strip(), self.config.bs4_parser)
 
         if not value:
+            m = re.search(
+                r"Recipient:\s*([^\n]+)", self.parsed.get_text("\n", strip=True)
+            )
+            if m:
+                value = BeautifulSoup(
+                    f"<div><div>{m.group(1).strip()}</div></div>",
+                    self.config.bs4_parser,
+                )
+
+        if not value:
             return None
 
         return Recipient(value, self.config)
@@ -344,6 +419,24 @@ class Order(Parsable):
 
                     if not combine_multiple:
                         break
+        if value is None:
+            text = self.parsed.get_text(" ", strip=True)
+            if contains == "estimated tax":
+                matches = re.findall(r"Tax \(.*?\):\s*([$\d.,]+)", text, flags=re.I)
+            else:
+                if contains in {"hst", "pst"}:
+                    pattern = rf"Tax[^$\n]*{re.escape(contains)}[^$\d]*([$\d.,]+)"
+                else:
+                    pattern = rf"{re.escape(contains)}[^$\d]*([$\d.,]+)"
+                matches = re.findall(pattern, text, flags=re.I)
+            for m in matches:
+                currency = self.to_currency(m)
+                if currency is not None:
+                    if value is None:
+                        value = 0.0
+                    value += currency
+                if not combine_multiple:
+                    break
 
         return value
 

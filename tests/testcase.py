@@ -453,7 +453,15 @@ class TestCase(unittest.TestCase):
         self.assertIsNotNone(order.order_details_link)
         self.assertEqual(date(2024, 9, 20), order.order_date)
         self.assertEqual(0, len(order.shipments))
-        self.assertEqual(0, len(order.items))
+        self.assertEqual(1, len(order.items))
+        self.assertEqual("Prime Membership Fee", order.items[0].title)
+        self.assertEqual(14.99, order.items[0].price)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(14.99, order.item_subtotal)
+        self.assertEqual(14.99, order.total_before_tax)
+        self.assertEqual(0.00, order.item_federal_tax)
+        self.assertEqual(0.00, order.item_provincial_tax)
+        self.assertEqual(0.00, order.estimated_tax)
 
         self.assertEqual(order.full_details, full_details)
 

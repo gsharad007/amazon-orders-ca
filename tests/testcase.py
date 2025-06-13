@@ -453,7 +453,16 @@ class TestCase(unittest.TestCase):
         self.assertIsNotNone(order.order_details_link)
         self.assertEqual(date(2024, 9, 20), order.order_date)
         self.assertEqual(0, len(order.shipments))
-        self.assertEqual(0, len(order.items))
+        self.assertEqual(1, len(order.items))
+        self.assertEqual("Prime Membership Fee", order.items[0].title)
+        self.assertEqual(14.99, order.items[0].price)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(14.99, order.item_subtotal)
+        self.assertEqual(14.99, order.total_before_tax)
+        self.assertEqual(0.00, order.item_federal_tax)
+        self.assertEqual(0.00, order.item_provincial_tax)
+        self.assertEqual(0.00, order.estimated_tax)
+        self.assertEqual(0.00, order.item_regulatory_fee)
 
         self.assertEqual(order.full_details, full_details)
 
@@ -537,3 +546,196 @@ class TestCase(unittest.TestCase):
             self.assertEqual(18.95, order.items[1].price)
             self.assertEqual(9.98, order.items[2].price)
             self.assertEqual(21.27, order.items[3].price)
+
+
+    def assert_order_701_2278739_3285841(self, order, full_details=False):
+        self.assertEqual("701-2278739-3285841", order.order_id)
+        self.assertEqual(30.50, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2024, 3, 12), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(1, len(order.shipments))
+        self.assertEqual("Return complete", order.shipments[0].delivery_status)
+        self.assertEqual(str(order.items), str(order.shipments[0].items))
+        self.assertEqual(1, len(order.items))
+        self.assertTrue(order.items[0].title.startswith("Thin Flat Extension Cord"))
+        self.assertIsNotNone(order.items[0].link)
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("Mastercard", order.payment_method)
+            self.assertEqual(1301, order.payment_method_last_4)
+            self.assertEqual(28.99, order.item_subtotal)
+            self.assertEqual(0.00, order.item_shipping_and_handling)
+            self.assertEqual(-2.00, order.coupon_savings)
+            self.assertEqual(26.99, order.total_before_tax)
+            self.assertEqual(3.51, order.item_federal_tax)
+            self.assertEqual(0.00, order.item_regulatory_fee)
+            self.assertEqual(28.99, order.items[0].price)
+            self.assertEqual("Tessan Direct", order.items[0].seller.name)
+            self.assertIsNotNone(order.items[0].seller.link)
+
+    def assert_order_701_3612180_7995405(self, order, full_details=False):
+        self.assertEqual("701-3612180-7995405", order.order_id)
+        self.assertEqual(673.33, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2024, 4, 26), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(1, len(order.shipments))
+        self.assertEqual(str(order.items), str(order.shipments[0].items))
+        self.assertEqual(3, len(order.items))
+        self.assertTrue(order.items[0].title.startswith("Amazon 5W USB"))
+        self.assertTrue("Kindle Scribe" in order.items[1].title)
+        self.assertTrue("Folio Cover" in order.items[2].title)
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("Mastercard", order.payment_method)
+            self.assertEqual(1301, order.payment_method_last_4)
+            self.assertEqual(594.97, order.item_subtotal)
+            self.assertEqual(0.00, order.item_shipping_and_handling)
+            self.assertEqual(595.87, order.total_before_tax)
+            self.assertEqual(77.46, order.item_federal_tax)
+            self.assertEqual(0.90, order.item_regulatory_fee)
+            self.assertEqual(23.42, order.items[0].price)
+            self.assertEqual(477.86, order.items[1].price)
+            self.assertEqual(93.69, order.items[2].price)
+
+    def assert_order_701_6757693_8305065(self, order, full_details=False):
+        self.assertEqual("701-6757693-8305065", order.order_id)
+        self.assertEqual(47.45, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2024, 5, 12), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(1, len(order.shipments))
+        self.assertEqual(str(order.items), str(order.shipments[0].items))
+        self.assertEqual(1, len(order.items))
+        self.assertTrue(order.items[0].title.startswith("SANOTO Bone Conduction"))
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("Mastercard", order.payment_method)
+            self.assertEqual(1301, order.payment_method_last_4)
+            self.assertEqual(59.99, order.item_subtotal)
+            self.assertEqual(13.98, order.item_shipping_and_handling)
+            self.assertEqual(-18.00, order.coupon_savings)
+            self.assertEqual(41.99, order.total_before_tax)
+            self.assertEqual(5.46, order.item_federal_tax)
+            self.assertEqual(59.99, order.items[0].price)
+
+    def assert_order_701_2605741_0401037(self, order, full_details=False):
+        self.assertEqual("701-2605741-0401037", order.order_id)
+        self.assertEqual(26.95, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2024, 11, 20), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(1, len(order.shipments))
+        self.assertEqual(str(order.items), str(order.shipments[0].items))
+        self.assertEqual(1, len(order.items))
+        self.assertTrue(order.items[0].title.startswith("Neem Oil"))
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("Mastercard", order.payment_method)
+            self.assertEqual(1301, order.payment_method_last_4)
+            self.assertEqual(26.34, order.item_subtotal)
+            self.assertEqual(0.00, order.item_shipping_and_handling)
+            self.assertEqual(-1.32, order.subscription_discount)
+            self.assertEqual(23.70, order.total_before_tax)
+            self.assertEqual(3.25, order.item_federal_tax)
+            self.assertEqual(26.34, order.items[0].price)
+
+    def assert_order_702_6894076_1433805(self, order, full_details=False):
+        self.assertEqual("702-6894076-1433805", order.order_id)
+        self.assertEqual(41.98, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2024, 10, 17), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(2, len(order.shipments))
+        self.assertEqual(2, len(order.items))
+        self.assertEqual(str(order.items[0].title), str(order.shipments[0].items[0].title))
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("American Express", order.payment_method)
+            self.assertEqual(1929, order.payment_method_last_4)
+            self.assertEqual(39.98, order.item_subtotal)
+            self.assertEqual(0.00, order.item_shipping_and_handling)
+            self.assertEqual(39.98, order.total_before_tax)
+            self.assertEqual(2.00, order.item_federal_tax)
+            self.assertEqual(19.99, order.items[0].price)
+            self.assertEqual(19.99, order.items[1].price)
+
+    def assert_order_D01_9338000_4893015_digital_order(self, order, full_details=False):
+        self.assertEqual("D01-9338000-4893015", order.order_id)
+        self.assertEqual(15.70, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2024, 7, 5), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(0, len(order.shipments))
+        self.assertEqual(1, len(order.items))
+        self.assertEqual("Audible Premium Plus", order.items[0].title)
+        self.assertEqual(14.95, order.items[0].price)
+        self.assertEqual(14.95, order.item_subtotal)
+        self.assertEqual(14.95, order.total_before_tax)
+        self.assertEqual(0.75, order.item_federal_tax)
+        self.assertEqual(0.75, order.estimated_tax)
+        self.assertEqual(0.00, order.item_regulatory_fee)
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("Mastercard", order.payment_method)
+            self.assertEqual(1301, order.payment_method_last_4)
+
+    def assert_order_701_3815833_5602607(self, order, full_details=False):
+        self.assertEqual("701-3815833-5602607", order.order_id)
+        self.assertEqual(370.85, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2024, 5, 27), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(3, len(order.shipments))
+        self.assertEqual(3, len(order.items))
+        self.assertTrue("Florencia" in order.items[0].title)
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("Mastercard", order.payment_method)
+            self.assertEqual(1301, order.payment_method_last_4)
+            self.assertEqual(328.18, order.item_subtotal)
+            self.assertEqual(0.00, order.item_shipping_and_handling)
+            self.assertEqual(328.18, order.total_before_tax)
+            self.assertEqual(42.67, order.item_federal_tax)
+            self.assertEqual(108.20, order.items[0].price)
+            self.assertEqual(109.99, order.items[1].price)
+            self.assertEqual(109.99, order.items[2].price)
+
+    def assert_order_702_9503699_0712205(self, order, full_details=False):
+        self.assertEqual("702-9503699-0712205", order.order_id)
+        self.assertEqual(37.32, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2024, 3, 3), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(2, len(order.shipments))
+        self.assertEqual(7, len(order.items))
+        self.assertTrue(order.items[0].title.startswith("Bubly Sparkling Water"))
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("Mastercard", order.payment_method)
+            self.assertEqual(1301, order.payment_method_last_4)
+            self.assertEqual(34.79, order.item_subtotal)
+            self.assertEqual(13.98, order.item_shipping_and_handling)
+            self.assertEqual(33.05, order.total_before_tax)
+            self.assertEqual(4.27, order.item_federal_tax)
+            self.assertEqual(4.97, order.items[0].price)
+
+
+

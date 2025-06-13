@@ -499,6 +499,133 @@ class TestOrders(UnitTestCase):
         self.assertIsNone(order.index)
         self.assertEqual(1, resp1.call_count)
 
+    @responses.activate
+    def test_get_order_701_2278739_3285841(self):
+        self.amazon_session.is_authenticated = True
+        order_id = "701-2278739-3285841"
+        with open(os.path.join(self.RESOURCES_DIR, "orders", "2024", f"order-details-{order_id}.html"), "r", encoding="utf-8") as f:
+            resp1 = responses.add(
+                responses.GET,
+                f"{self.test_config.constants.ORDER_DETAILS_URL}?orderID={order_id}",
+                body=f.read(),
+                status=200,
+            )
+        order = self.amazon_orders.get_order(order_id)
+        self.assert_order_701_2278739_3285841(order, True)
+        self.assertIsNone(order.index)
+        self.assertEqual(1, resp1.call_count)
+
+    @responses.activate
+    def test_get_order_701_3612180_7995405(self):
+        self.amazon_session.is_authenticated = True
+        order_id = "701-3612180-7995405"
+        with open(os.path.join(self.RESOURCES_DIR, "orders", "2024", f"order-details-{order_id}.html"), "r", encoding="utf-8") as f:
+            resp1 = responses.add(
+                responses.GET,
+                f"{self.test_config.constants.ORDER_DETAILS_URL}?orderID={order_id}",
+                body=f.read(),
+                status=200,
+            )
+        order = self.amazon_orders.get_order(order_id)
+        self.assert_order_701_3612180_7995405(order, True)
+        self.assertIsNone(order.index)
+        self.assertEqual(1, resp1.call_count)
+
+    @responses.activate
+    def test_get_order_701_6757693_8305065(self):
+        self.amazon_session.is_authenticated = True
+        order_id = "701-6757693-8305065"
+        with open(os.path.join(self.RESOURCES_DIR, "orders", "2024", f"order-details-{order_id}.html"), "r", encoding="utf-8") as f:
+            resp1 = responses.add(
+                responses.GET,
+                f"{self.test_config.constants.ORDER_DETAILS_URL}?orderID={order_id}",
+                body=f.read(),
+                status=200,
+            )
+        order = self.amazon_orders.get_order(order_id)
+        self.assert_order_701_6757693_8305065(order, True)
+        self.assertIsNone(order.index)
+        self.assertEqual(1, resp1.call_count)
+
+    @responses.activate
+    def test_get_order_701_2605741_0401037(self):
+        self.amazon_session.is_authenticated = True
+        order_id = "701-2605741-0401037"
+        with open(os.path.join(self.RESOURCES_DIR, "orders", "2024", f"order-details-{order_id}.html"), "r", encoding="utf-8") as f:
+            resp1 = responses.add(
+                responses.GET,
+                f"{self.test_config.constants.ORDER_DETAILS_URL}?orderID={order_id}",
+                body=f.read(),
+                status=200,
+            )
+        order = self.amazon_orders.get_order(order_id)
+        self.assert_order_701_2605741_0401037(order, True)
+        self.assertIsNone(order.index)
+        self.assertEqual(1, resp1.call_count)
+
+    @responses.activate
+    def test_get_order_702_6894076_1433805(self):
+        self.amazon_session.is_authenticated = True
+        order_id = "702-6894076-1433805"
+        with open(os.path.join(self.RESOURCES_DIR, "orders", "2024", f"order-details-{order_id}.html"), "r", encoding="utf-8") as f:
+            resp1 = responses.add(
+                responses.GET,
+                f"{self.test_config.constants.ORDER_DETAILS_URL}?orderID={order_id}",
+                body=f.read(),
+                status=200,
+            )
+        order = self.amazon_orders.get_order(order_id)
+        self.assert_order_702_6894076_1433805(order, True)
+        self.assertIsNone(order.index)
+        self.assertEqual(1, resp1.call_count)
+
+    @responses.activate
+    def test_get_order_D01_9338000_4893015(self):
+        self.amazon_session.is_authenticated = True
+        order_id = "D01-9338000-4893015"
+        with open(os.path.join(self.RESOURCES_DIR, "orders", "2024", f"order-summary-{order_id}.html"), "r", encoding="utf-8") as f:
+            resp1 = responses.add(
+                responses.GET,
+                f"{self.test_config.constants.ORDER_DETAILS_URL}?orderID={order_id}",
+                body=f.read(),
+                status=200,
+            )
+        order = self.amazon_orders.get_order(order_id)
+        self.assert_order_D01_9338000_4893015_digital_order(order, True)
+        self.assertIsNone(order.index)
+        self.assertEqual(1, resp1.call_count)
+
+    @responses.activate
+    def test_get_order_701_3815833_5602607(self):
+        self.amazon_session.is_authenticated = True
+        order_id = "701-3815833-5602607"
+        with open(os.path.join(self.RESOURCES_DIR, "orders", "2024", f"order-details-{order_id}.html"), "r", encoding="utf-8") as f:
+            resp1 = responses.add(
+                responses.GET,
+                f"{self.test_config.constants.ORDER_DETAILS_URL}?orderID={order_id}",
+                body=f.read(),
+                status=200,
+            )
+        order = self.amazon_orders.get_order(order_id)
+        self.assert_order_701_3815833_5602607(order, True)
+        self.assertIsNone(order.index)
+        self.assertEqual(1, resp1.call_count)
+
+    @responses.activate
+    def test_get_order_702_9503699_0712205(self):
+        self.amazon_session.is_authenticated = True
+        order_id = "702-9503699-0712205"
+        with open(os.path.join(self.RESOURCES_DIR, "orders", "2024", f"order-details-{order_id}.html"), "r", encoding="utf-8") as f:
+            resp1 = responses.add(
+                responses.GET,
+                f"{self.test_config.constants.ORDER_DETAILS_URL}?orderID={order_id}",
+                body=f.read(),
+                status=200,
+            )
+        order = self.amazon_orders.get_order(order_id)
+        self.assert_order_702_9503699_0712205(order, True)
+        self.assertIsNone(order.index)
+        self.assertEqual(1, resp1.call_count)
     @unittest.skipIf(not os.path.exists(temp_order_history_file_path),
                      reason="Skipped, to debug an order history page, "
                             "place it at tests/output/temp-order-history.html")

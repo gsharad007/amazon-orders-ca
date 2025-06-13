@@ -6,6 +6,7 @@ import logging
 from typing import Dict, List, Optional, Tuple
 
 from bs4 import Tag
+import re
 from dateutil import parser
 
 from amazonorders import util
@@ -20,6 +21,16 @@ logger = logging.getLogger(__name__)
 def _parse_transaction_form_tag(form_tag: Tag,
                                 config: AmazonOrdersConfig) \
         -> Tuple[List[Transaction], Optional[Dict[str, str]]]:
+    html_str = str(form_tag)
+    base_url = config.constants.BASE_URL
+    match = re.search(r"ue_sn\s*=\s*['\"](www\.amazon\.(com|ca))", html_str)
+    if match:
+        base_url = f"https://{match.group(1)}"
+    else:
+        match = re.search(r"https://www\.amazon\.(com|ca)", html_str)
+        if match:
+            base_url = match.group(0)
+
     transactions = []
     date_container_tags = util.select(form_tag, config.selectors.TRANSACTION_DATE_CONTAINERS_SELECTOR)
     for date_container_tag in date_container_tags:
@@ -37,9 +48,11 @@ def _parse_transaction_form_tag(form_tag: Tag,
             logger.warning("Could not find transactions container tag in Transaction form.")
             continue
 
-        transaction_tags = util.select(transactions_container_tag, config.selectors.TRANSACTIONS_SELECTOR)
+        transaction_tags = util.select(
+            transactions_container_tag, config.selectors.TRANSACTIONS_SELECTOR
+        )
         for transaction_tag in transaction_tags:
-            transaction = Transaction(transaction_tag, config, date)
+            transaction = Transaction(transaction_tag, config, date, base_url=base_url)
             transactions.append(transaction)
 
     form_state_input = util.select_one(form_tag, config.selectors.TRANSACTIONS_NEXT_PAGE_INPUT_STATE_SELECTOR)
@@ -136,4 +149,12 @@ class AmazonTransactions:
         """Get Amazon transaction history for the given year."""
         days = (datetime.date.today() - datetime.date(year, 1, 1)).days + 30
         transactions = self.get_transactions(days=days)
-        return [t for t in transactions if t.completed_date.year == year]
+
+        seen_order_ids = set()
+        filtered = []
+        for t in transactions:
+            if t.completed_date.year == year and t.order_id not in seen_order_ids:
+                filtered.append(t)
+                seen_order_ids.add(t.order_id)
+
+        return filtered

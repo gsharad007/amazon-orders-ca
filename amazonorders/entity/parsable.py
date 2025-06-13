@@ -181,9 +181,13 @@ class Parsable:
         if not url.startswith("http"):
             base_url = self.config.constants.BASE_URL
             html_str = str(self.parsed)
-            match = re.search(r"https://www\.amazon\.(com|ca)", html_str)
+            match = re.search(r"ue_sn\s*=\s*['\"](www\.amazon\.(com|ca))", html_str)
             if match:
-                base_url = match.group(0)
+                base_url = f"https://{match.group(1)}"
+            else:
+                match = re.search(r"https://www\.amazon\.(com|ca)", html_str)
+                if match:
+                    base_url = match.group(0)
             url = f"{base_url}{url}"
         return url
 

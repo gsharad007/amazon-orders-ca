@@ -230,7 +230,7 @@ class TestOrders(UnitTestCase):
         # THEN
         self.assertEqual(10, len(orders))
         self.assertEqual(1, resp1.call_count)
-        self.assertEqual(6, resp2.call_count)
+        self.assertEqual(5, resp2.call_count)
 
     @responses.activate
     def test_get_order_history_full_details(self):

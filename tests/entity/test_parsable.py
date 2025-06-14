@@ -24,3 +24,18 @@ class TestItem(UnitTestCase):
         self.assertEqual(parsable.to_currency("1,234.99"), 1234.99)
         self.assertEqual(parsable.to_currency("$1,234.99"), 1234.99)
         self.assertIsNone(parsable.to_currency("not currency"))
+
+    def test_with_base_url_inferred_from_script(self):
+        # GIVEN
+        html = (
+            "<html><head><script>ue_sn = 'www.amazon.com',</script></head>"
+            "<body><a href='/gp/test'>Test</a></body></html>"
+        )
+        parsed = BeautifulSoup(html, self.test_config.bs4_parser)
+
+        # WHEN
+        parsable = Parsable(parsed, self.test_config)
+        link = parsable.simple_parse("a", attr_name="href")
+
+        # THEN
+        self.assertEqual(link, "https://www.amazon.com/gp/test")

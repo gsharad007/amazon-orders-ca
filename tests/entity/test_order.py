@@ -27,7 +27,7 @@ class TestOrder(UnitTestCase):
         self.assertEqual(order.total_before_tax, 3333.99)
         self.assertEqual(order.estimated_tax, 4444.99)
         self.assertIsNone(order.refund_total)
-        self.assertIsNone(order.subscription_discount)
+        self.assertEqual(0.0, order.subscription_discount)
         self.assertEqual(order.grand_total, 7777.99)
 
     def test_order_invoice_link(self):

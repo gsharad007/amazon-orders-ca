@@ -111,7 +111,9 @@ class Order(Parsable):
         self.shipping_total: Optional[float] = self._if_full_details(self._parse_currency("shipping")) or 0.0
         #: The Order free shipping. Only populated when ``full_details`` is ``True``.
         self.free_shipping: Optional[float] = self._if_full_details(self._parse_currency("free shipping")) or 0.0
-        self.item_shipping_and_handling: Optional[float] = (self.shipping_total or 0.0) - (self.free_shipping or 0.0)
+        self.item_shipping_and_handling: Optional[float] = (
+            (self.shipping_total or 0.0) + (self.free_shipping or 0.0)
+        )
         #: The Order promotion applied. Only populated when ``full_details`` is ``True``.
         self.promotion: float = self._if_full_details(
             self._parse_currency("promotion", combine_multiple=True)) or 0.0

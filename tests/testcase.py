@@ -732,10 +732,77 @@ class TestCase(unittest.TestCase):
             self.assertEqual("Mastercard", order.payment_method)
             self.assertEqual(1301, order.payment_method_last_4)
             self.assertEqual(34.79, order.item_subtotal)
-            self.assertEqual(13.98, order.item_shipping_and_handling)
+            self.assertEqual(0.00, order.item_shipping_and_handling)
             self.assertEqual(33.05, order.total_before_tax)
             self.assertEqual(4.27, order.item_federal_tax)
             self.assertEqual(4.97, order.items[0].price)
+
+    def assert_order_702_7200239_3881040(self, order, full_details=False):
+        self.assertEqual("702-7200239-3881040", order.order_id)
+        self.assertEqual(67.79, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2024, 2, 2), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(1, len(order.shipments))
+        self.assertEqual(str(order.items), str(order.shipments[0].items))
+        self.assertEqual(1, len(order.items))
+        self.assertTrue(order.items[0].title.startswith("Capri Tools 21050"))
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("Mastercard", order.payment_method)
+            self.assertEqual(1301, order.payment_method_last_4)
+            self.assertEqual(59.99, order.item_subtotal)
+            self.assertEqual(0.00, order.item_shipping_and_handling)
+            self.assertEqual(59.99, order.total_before_tax)
+            self.assertEqual(7.80, order.item_federal_tax)
+            self.assertEqual(59.99, order.items[0].price)
+
+    def assert_order_702_7633140_4494667(self, order, full_details=False):
+        self.assertEqual("702-7633140-4494667", order.order_id)
+        self.assertEqual(43.02, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2024, 2, 2), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(1, len(order.shipments))
+        self.assertEqual(str(order.items), str(order.shipments[0].items))
+        self.assertEqual(2, len(order.items))
+        self.assertTrue(order.items[0].title.startswith("Gorilla High Performance"))
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("Mastercard", order.payment_method)
+            self.assertEqual(1301, order.payment_method_last_4)
+            self.assertEqual(38.07, order.item_subtotal)
+            self.assertEqual(0.00, order.item_shipping_and_handling)
+            self.assertEqual(38.07, order.total_before_tax)
+            self.assertEqual(4.95, order.item_federal_tax)
+            self.assertEqual(14.54, order.items[0].price)
+            self.assertEqual(8.99, order.items[1].price)
+
+    def assert_order_702_8836580_6196229(self, order, full_details=False):
+        self.assertEqual("702-8836580-6196229", order.order_id)
+        self.assertEqual(56.49, order.grand_total)
+        self.assertIsNotNone(order.order_details_link)
+        self.assertEqual(date(2023, 12, 15), order.order_date)
+        self.assertEqual("Pooja Jain", order.recipient.name)
+        self.assertEqual(1, len(order.shipments))
+        self.assertEqual(str(order.items), str(order.shipments[0].items))
+        self.assertEqual(1, len(order.items))
+        self.assertTrue(order.items[0].title.startswith("JASAMBAC Cocktail Dress"))
+
+        self.assertEqual(order.full_details, full_details)
+
+        if full_details:
+            self.assertEqual("Mastercard", order.payment_method)
+            self.assertEqual(1301, order.payment_method_last_4)
+            self.assertEqual(49.99, order.item_subtotal)
+            self.assertEqual(0.00, order.item_shipping_and_handling)
+            self.assertEqual(49.99, order.total_before_tax)
+            self.assertEqual(6.50, order.item_federal_tax)
+            self.assertEqual(49.99, order.items[0].price)
 
 
 

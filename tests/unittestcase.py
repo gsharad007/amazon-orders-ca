@@ -22,6 +22,9 @@ class UnitTestCase(TestCase):
         self.username = os.environ.pop('AMAZON_USERNAME', None)
         self.password = os.environ.pop('AMAZON_PASSWORD', None)
         self.otp_secret_key = os.environ.pop('AMAZON_OTP_SECRET_KEY', None)
+        # Ensure a consistent base URL for tests
+        self.base_url = os.environ.pop('AMAZON_BASE_URL', None)
+        os.environ['AMAZON_BASE_URL'] = 'https://www.amazon.com'
 
         conf.DEFAULT_CONFIG_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), ".config")
         self.test_output_dir = os.path.join(conf.DEFAULT_CONFIG_DIR, "output")
@@ -45,12 +48,18 @@ class UnitTestCase(TestCase):
             os.environ["AMAZON_PASSWORD"] = self.password
         if self.otp_secret_key:
             os.environ["AMAZON_OTP_SECRET_KEY"] = self.otp_secret_key
+        if self.base_url:
+            os.environ['AMAZON_BASE_URL'] = self.base_url
+        else:
+            os.environ.pop('AMAZON_BASE_URL', None)
 
     def given_login_responses_success(self):
-        with open(os.path.join(self.RESOURCES_DIR, "auth", "signin.html"), "r", encoding="utf-8") as f:
+        with open(
+            os.path.join(self.RESOURCES_DIR, "auth", "signin.html"), "r", encoding="utf-8"
+        ) as f:
             self.signin_response = responses.add(
                 responses.GET,
-                self.test_config.constants.SIGN_IN_URL,
+                re.compile(f"{self.test_config.constants.SIGN_IN_URL}.*"),
                 body=f.read(),
                 status=200,
             )
@@ -92,19 +101,49 @@ class UnitTestCase(TestCase):
                 match=[urlencoded_params_matcher(request_data)],
             )
 
-    def given_order_history_exists(self, year, start_index=0):
-        with open(os.path.join(self.RESOURCES_DIR, "orders", f"order-history-{year}-{start_index}.html"), "r",
-                  encoding="utf-8") as f:
-            optional_start_index = f"&startIndex={start_index}" if start_index else ""
-            return responses.add(
+    def given_order_history_exists(self, year, start_index=None):
+        file_index = start_index if start_index is not None else 0
+        with open(
+            os.path.join(self.RESOURCES_DIR, "orders", f"order-history-{year}-{file_index}.html"),
+            "r",
+            encoding="utf-8",
+        ) as f:
+            optional_start_index = (
+                f"&startIndex={start_index}"
+                if start_index is not None and str(start_index) != ""
+                else ""
+            )
+            response = responses.add(
                 responses.GET,
-                "{url}?timeFilter=year-{year}"
-                "{optional_start_index}".format(url=self.test_config.constants.ORDER_HISTORY_URL,
-                                                year=year,
-                                                optional_start_index=optional_start_index),
+                "{url}?timeFilter=year-{year}{optional_start_index}".format(
+                    url=self.test_config.constants.ORDER_HISTORY_URL,
+                    year=year,
+                    optional_start_index=optional_start_index,
+                ),
                 body=f.read(),
                 status=200,
             )
+
+        # Some pages may trigger additional search URL loads; stub those too
+        with open(
+            os.path.join(
+                self.RESOURCES_DIR,
+                "orders",
+                "order-summary-D01-9262519-8073835.html",
+            ),
+            "r",
+            encoding="utf-8",
+        ) as summary_file:
+            responses.add(
+                responses.GET,
+                re.compile(
+                    f"{self.test_config.constants.BASE_URL}/gp/your-account/order-history.*"
+                ),
+                body=summary_file.read(),
+                status=200,
+            )
+
+        return response
 
     def given_transactions_exists(self):
         with open(os.path.join(self.RESOURCES_DIR, "transactions", "get-transactions-snippet.html"), "r",
@@ -131,7 +170,7 @@ class UnitTestCase(TestCase):
                   encoding="utf-8") as f:
             return responses.add(
                 responses.GET,
-                re.compile(f"{self.test_config.constants.ORDER_DETAILS_URL}?.*"),
+                re.compile(f"{self.test_config.constants.ORDER_DETAILS_URL}.*"),
                 body=f.read(),
                 status=200,
             )

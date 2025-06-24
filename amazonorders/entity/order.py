@@ -121,7 +121,10 @@ class Order(Parsable):
         self.coupon_savings: float = self._if_full_details(
             self._parse_currency("coupon", combine_multiple=True)) or 0.0
         #: The Order Subscribe & Save discount. Only populated when ``full_details`` is ``True``.
-        self.subscription_discount: float = self._if_full_details(self._parse_currency("subscribe")) or 0.0
+        # Only populate when a subscription discount is present; otherwise None
+        self.subscription_discount: Optional[float] = self._if_full_details(
+            self._parse_currency("subscribe")
+        )
         #: The Order paid by amazon applied. Only populated when ``full_details`` is ``True``.
         self.other_promotions: float = (
             self._if_full_details(

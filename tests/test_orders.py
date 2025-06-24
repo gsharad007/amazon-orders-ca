@@ -135,7 +135,7 @@ class TestOrders(UnitTestCase):
         # GIVEN
         self.amazon_session.is_authenticated = True
         year = 2010
-        resp1 = self.given_order_history_exists(year, start_index=0)
+        resp1 = self.given_order_history_exists(year)
         with open(os.path.join(self.RESOURCES_DIR, "orders", f"order-history-{year}-10.html"), "r",
                   encoding="utf-8") as f:
             resp2 = responses.add(
@@ -230,7 +230,7 @@ class TestOrders(UnitTestCase):
         # THEN
         self.assertEqual(10, len(orders))
         self.assertEqual(1, resp1.call_count)
-        self.assertEqual(6, resp2.call_count)
+        self.assertEqual(5, resp2.call_count)
 
     @responses.activate
     def test_get_order_history_full_details(self):

@@ -3,6 +3,7 @@ __license__ = "MIT"
 
 from amazonorders.conf import AmazonOrdersConfig
 from bs4 import BeautifulSoup
+import pytest
 
 from amazonorders.entity.item import Item
 from tests.unittestcase import UnitTestCase
@@ -41,6 +42,9 @@ class TestItem(UnitTestCase):
         self.assertEqual(item.price, 1234.99)
 
     def test_title_starts_with_ampersand_use_lxml(self):
+        # Skip if lxml parser isn't available
+        pytest.importorskip("lxml")
+
         # GIVEN
         lxml_config = AmazonOrdersConfig(data={
             "output_dir": self.test_output_dir,

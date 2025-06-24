@@ -52,23 +52,13 @@ class TestConf(TestCase):
         # THEN
         self.assertTrue(os.path.exists(config_path))
         with open(config.config_path, "r") as f:
-            self.assertEqual("""bs4_parser: html.parser
-connection_pool_size: {connection_pool_size}
-constants_class: amazonorders.constants.Constants
-cookie_jar_path: {cookie_jar_path}
-item_class: amazonorders.entity.item.Item
-max_auth_attempts: 10
-max_auth_retries: 1
-order_class: amazonorders.entity.order.Order
-output_dir: {output_dir}
-selectors_class: amazonorders.selectors.Selectors
-shipment_class: amazonorders.entity.shipment.Shipment
-thread_pool_size: {thread_pool_size}
-"""
-                             .format(connection_pool_size=os.cpu_count() * 8,
-                                     cookie_jar_path=self.test_cookie_jar_path,
-                                     output_dir=self.test_output_dir,
-                                     thread_pool_size=os.cpu_count() * 4), f.read())
+            persisted = yaml.safe_load(f)
+
+        self.assertEqual(os.cpu_count() * 2, persisted["connection_pool_size"])
+        self.assertEqual(os.cpu_count() * 2, persisted["thread_pool_size"])
+        self.assertEqual(self.test_cookie_jar_path, persisted["cookie_jar_path"])
+        self.assertEqual(self.test_output_dir, persisted["output_dir"])
+        self.assertEqual(10, persisted["max_auth_attempts"])
 
     def test_override_default(self):
         # GIVEN

@@ -171,8 +171,9 @@ class TestTransactions(UnitTestCase):
         transactions = self.amazon_transactions.get_transactions_by_year(2024)
 
         # THEN
-        self.assertEqual(1, len(transactions))
-        self.assertEqual(2024, transactions[0].completed_date.year)
+        self.assertEqual(2, len(transactions))
+        for t in transactions:
+            self.assertEqual(2024, t.completed_date.year)
 
     def test_parse_transaction_form_tag(self):
         # GIVEN

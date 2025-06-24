@@ -4,6 +4,7 @@ __license__ = "MIT"
 import os
 import sys
 import time
+import unittest
 
 from amazonorders import conf
 from amazonorders.conf import AmazonOrdersConfig
@@ -48,10 +49,12 @@ class IntegrationTestCase(TestCase):
         # ensure the next token has been generated
         cls.reauth_sleep_time = 3 if "AMAZON_OTP_SECRET_KEY" not in os.environ else 61
 
-        if not (os.environ.get("AMAZON_USERNAME") and os.environ.get("AMAZON_PASSWORD")):
-            print("AMAZON_USERNAME and AMAZON_PASSWORD environment variables must be set to run integration tests")
-
-            sys.exit(1)
+        if not (
+            os.environ.get("AMAZON_USERNAME") and os.environ.get("AMAZON_PASSWORD")
+        ):
+            raise unittest.SkipTest(
+                "AMAZON_USERNAME and AMAZON_PASSWORD environment variables must be set to run integration tests"
+            )
 
         conf.DEFAULT_CONFIG_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), ".integration-config")
         test_output_dir = os.path.join(conf.DEFAULT_CONFIG_DIR, "output")

@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Detect JavaScript-based auth challenges (which can be solved) and give more clear error for them.
 - Stability improvements.
 - Documentation improvements.
+- Skip integration tests when Amazon credentials are missing.
+- Treat the CLI `--year` option as optional to better support days-based lookups.
 
 ## [4.0.2](https://github.com/alexdlaird/amazon-orders/compare/4.0.1...4.0.2) - 2025-04-25
 

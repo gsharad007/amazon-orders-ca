@@ -383,6 +383,12 @@ def transactions(ctx: Context, **kwargs: Any):
         days = kwargs["days"]
         full_details = kwargs["full_details"]
 
+        # Determine if the year flag was explicitly provided; otherwise default
+        # to days-based output and retrieval
+        year_param_source = ctx.get_parameter_source("year")
+        if year_param_source == click.core.ParameterSource.DEFAULT:
+            year = None
+
         click.echo("-----------------------------------------------------------------------")
         if year:
             click.echo("Transaction History for {year} year".format(year=year))
@@ -399,7 +405,7 @@ def transactions(ctx: Context, **kwargs: Any):
 
         start_time = time.time()
 
-        if kwargs["year"]:
+        if year is not None:
             transactions = amazon_transactions.get_transactions_by_year(year)
         else:
             transactions = amazon_transactions.get_transactions(days=days)

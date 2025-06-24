@@ -14,6 +14,7 @@ dependencies = [
     "PyYAML>=5.1",
     "python-dateutil>=2.8",
     "pyotp>=2.9",
+    "ruff>=0.12.0",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",

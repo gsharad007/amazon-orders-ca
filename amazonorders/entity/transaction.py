@@ -23,14 +23,18 @@ class Transaction(Parsable):
     An Amazon Transaction.
     """
 
-    def __init__(self,
-                 parsed: Tag,
-                 config: AmazonOrdersConfig,
-                 completed_date: date,
-                 index: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        parsed: Tag,
+        config: AmazonOrdersConfig,
+        completed_date: date,
+        index: Optional[int] = None,
+        base_url: Optional[str] = None,
+    ) -> None:
         super().__init__(parsed, config)
 
         self.index: Optional[int] = index
+        self.base_url: Optional[str] = base_url
 
         #: The Transaction completed date.
         self.completed_date: date = completed_date
@@ -94,8 +98,7 @@ class Transaction(Parsable):
         )
 
         if not value and self.order_id:
-            value = (
-                f"{self.config.constants.ORDER_DETAILS_URL}?orderID={self.order_id}"
-            )
+            base_url = self.base_url or self.config.constants.BASE_URL
+            value = f"{base_url}/gp/your-account/order-details?orderID={self.order_id}"
 
         return value
